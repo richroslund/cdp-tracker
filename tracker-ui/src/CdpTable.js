@@ -33,8 +33,16 @@ export class CdpTable extends React.Component {
                   accessor: "cupi"
                 },
                 {
-                  Header: "Safe",
-                  accessor: "safe"
+                  Header: "Peth (collateral)",
+                  accessor: "ink"
+                },
+                {
+                  Header: "Dai (debt)",
+                  accessor: "art"
+                },
+                {
+                  Header: "State",
+                  accessor: "state"
                 }
               ]
             },
@@ -43,10 +51,6 @@ export class CdpTable extends React.Component {
                 {
                   Header: "Lad",
                   accessor: "lad"
-                },
-                {
-                  Header: "Ink",
-                  accessor: "ink"
                 }
               ]
             }

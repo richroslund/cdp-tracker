@@ -1,7 +1,6 @@
 version: '3'
 services:
   fetcher:
-    restart: 'always'
     build: ./tracker-fetcher
     networks:
       - redis-net
@@ -12,7 +11,7 @@ services:
     environment:
       - NODE_ENV=development
       - REDIS_URL=redis://redis:6379
-      - MAKER_URL=https://dai-service.makerdao.com/cups
+      - MAKER_URL=https://mkr.tools/api/cdps
     command: ["yarn", "start"]
   api:
     build: ./tracker-service
