@@ -1,0 +1,45 @@
+version: '3'
+services:
+  service:
+    build: ./tracker-service
+    ports:
+      - 3001:3000
+    networks:
+      - redis-net
+      - tracker-net
+    depends_on:
+      - redis
+    volumes:
+      - ./tracker-service:/app
+    environment:
+      - NODE_ENV=development
+    command: ["yarn", "start"]
+  ui:
+    container_name: trackerui
+    build: ./tracker-ui
+    volumes:
+      - './tracker-ui:/app'
+      - '/app/node_modules'
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+    networks:
+      - tracker-net
+    command: ["yarn", "start"]
+
+  redis:
+    image: redis:4.0.5-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    hostname: redis
+    networks:
+      - redis-net
+    volumes:
+      - redis-data:/data
+
+networks:
+  redis-net:
+  tracker-net:
+
+volumes:
+  redis-data:
