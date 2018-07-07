@@ -4,16 +4,26 @@ const axios = require('axios');
 const redis = require('redis');
 const app = express();
 const _ = require('lodash');
+var cors = require('cors')
 
 var kue = require('kue')
 var queue = kue.createQueue({redis: process.env.REDIS_URL});
 var db = redis.createClient(process.env.REDIS_URL);
+app.use(cors())
 
+var queueJob = () =>{
+  var job = queue.create('fetch-cdps').save( function(err){
+    if( err )
+      return err;
+    return job;
+  });
+} 
 
 app.get('/', (req, res) => {
   return res.json({ version: "0.0.1" });
 });
 app.get('/cdp', (req, res) => {
+  queueJob();
   db.hgetall("cdp", function (err, obj) {
     return res.json(_.map(obj, (cdp) => JSON.parse(cdp)));
   });
@@ -21,11 +31,7 @@ app.get('/cdp', (req, res) => {
 
 
 app.post('/cdp/refresh', (req, res) => {
-  var job = queue.create('fetch-cdps').save( function(err){
-    if( err )
-      return res.json({error: err});
-    return res.json({id: job.id})
-  });
+  return res.json(queueJob());
 });
 
 app.get('/cdp/:cdpid', (req, res) => {

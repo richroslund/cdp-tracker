@@ -1,20 +1,26 @@
 import React from "react";
-import { render } from "react-dom";
-import { makeData, Logo, Tips } from "./Utils";
 
 // Import React Table
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
-class App extends React.Component {
+export class CdpTable extends React.Component {
   constructor() {
     super();
     this.state = {
-      data: makeData()
+      data: []
     };
+  }
+  componentDidMount() {
+    fetch(`${process.env.REACT_APP_API_URL}/cdp`)
+    .then(res => res.json())
+    .then(results => {
+      this.setState({...this.state, data: results});
+    });
   }
   render() {
     const { data } = this.state;
+    console.log(data);
     return (
       <div>
         <ReactTable
@@ -23,33 +29,24 @@ class App extends React.Component {
             {
               columns: [
                 {
-                  Header: "First Name",
-                  accessor: "firstName"
+                  Header: "Id",
+                  accessor: "cupi"
                 },
                 {
-                  Header: "Last Name",
-                  id: "lastName",
-                  accessor: d => d.lastName
+                  Header: "Safe",
+                  accessor: "safe"
                 }
               ]
             },
             {
               columns: [
                 {
-                  Header: "Age",
-                  accessor: "age"
+                  Header: "Lad",
+                  accessor: "lad"
                 },
                 {
-                  Header: "Status",
-                  accessor: "status"
-                }
-              ]
-            },
-            {
-              columns: [
-                {
-                  Header: "Visits",
-                  accessor: "visits"
+                  Header: "Ink",
+                  accessor: "ink"
                 }
               ]
             }
@@ -58,11 +55,7 @@ class App extends React.Component {
           className="-striped -highlight"
         />
         <br />
-        <Tips />
-        <Logo />
       </div>
     );
   }
 }
-
-render(<App />, document.getElementById("root"));
