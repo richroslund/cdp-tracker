@@ -51,7 +51,7 @@ services:
     networks:
       - redis-net
     volumes:
-      - redis-data:/data
+      - ./redis-data:/data
 
   redis-commander:
     container_name: redis-commander

@@ -18,7 +18,6 @@ queue.process('fetch-cdps', function(job, done){
     db.set("cdp_total",response.total, redis.print);
     db.set("cdp_lastBlockNumber",response.lastBlockNumber, redis.print);
     _.forEach(response.results, (cdp) => {
-      console.log(cdp.cupi);
       db.hset("cdp",cdp.cupi, JSON.stringify(cdp), redis.print);
     });
   })

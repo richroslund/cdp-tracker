@@ -20,7 +20,7 @@ class App extends Component {
                 </Hero>
                 <Section>
                     <Container>
-                    <h1 className="App-title">Welcome to React</h1>
+                    <h1 className="App-title">Track some CDPs</h1>
                     <p className="App-intro">
         To get started, edit <code>src/App.js</code> and save to reload.
                     </p>

@@ -3,19 +3,19 @@ const path = require('path');
 const axios = require('axios');
 const redis = require('redis');
 const app = express();
+const _ = require('lodash');
 
 var kue = require('kue')
 var queue = kue.createQueue({redis: process.env.REDIS_URL});
-// var db = redis.createClient(process.env.REDIS_URL);
+var db = redis.createClient(process.env.REDIS_URL);
 
 
 app.get('/', (req, res) => {
   return res.json({ version: "0.0.1" });
 });
 app.get('/cdp', (req, res) => {
-  redis.createClient(process.env.REDIS_URL).hgetall("cdp", function (err, obj) {
-    console.dir(obj);
-    return obj;
+  db.hgetall("cdp", function (err, obj) {
+    return res.json(_.map(obj, (cdp) => JSON.parse(cdp)));
   });
 });
 
@@ -30,12 +30,11 @@ app.post('/cdp/refresh', (req, res) => {
 
 app.get('/cdp/:cdpid', (req, res) => {
   console.dir(req.params.cdpid);
-  redis.createClient(process.env.REDIS_URL).hget("cdp", req.params.cdpid, function (err, obj) {
+  db.hget("cdp", req.params.cdpid, function (err, obj) {
     if (err) {
       console.log(err);
       return res.json(err);
     }
-      
     return res.json(JSON.parse(obj));
   });
 });
