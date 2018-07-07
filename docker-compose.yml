@@ -1,6 +1,18 @@
 version: '3'
 services:
-  service:
+  fetcher:
+    build: ./tracker-fetcher
+    networks:
+      - redis-net
+    depends_on:
+      - redis
+    volumes:
+      - ./tracker-fetcher:/app
+    environment:
+      - NODE_ENV=development
+      - REDIS_URL=redis://redis:6379
+    command: ["yarn", "start"]
+  api:
     build: ./tracker-service
     ports:
       - 3001:3000
@@ -13,9 +25,9 @@ services:
       - ./tracker-service:/app
     environment:
       - NODE_ENV=development
-    command: ["yarn", "start"]
+      - REDIS_URL=redis://redis:6379
+    command: ["yarn", "run", "dev"]
   ui:
-    container_name: trackerui
     build: ./tracker-ui
     volumes:
       - './tracker-ui:/app'
@@ -24,6 +36,7 @@ services:
       - '3000:3000'
     environment:
       - NODE_ENV=development
+      - API_URL=http://api:3000
     networks:
       - tracker-net
     command: ["yarn", "start"]
@@ -36,6 +49,17 @@ services:
       - redis-net
     volumes:
       - redis-data:/data
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - 8081:8081
+    networks:
+      - redis-net
 
 networks:
   redis-net:
