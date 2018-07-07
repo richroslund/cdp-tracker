@@ -4,6 +4,29 @@ import React from "react";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
+export class EthPrice extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      price: "NULL"
+    };
+  }
+  componentDidMount() {
+    fetch(`${process.env.REACT_APP_API_URL}/price/eth`)
+    .then(res => res.json())
+    .then(results => {
+      this.setState({...this.state, price: results.price});
+    });
+  }
+  render() {
+    const { price } = this.state;
+    return (
+      <div><strong>Ethereum:</strong> ${price}
+      </div>
+    );
+  }
+}
+
 export class CdpTable extends React.Component {
   constructor() {
     super();
@@ -20,7 +43,6 @@ export class CdpTable extends React.Component {
   }
   render() {
     const { data } = this.state;
-    console.log(data);
     return (
       <div>
         <ReactTable
@@ -49,8 +71,8 @@ export class CdpTable extends React.Component {
             {
               columns: [
                 {
-                  Header: "Lad",
-                  accessor: "lad"
+                  Header: "Owner",
+                  accessor: "owner"
                 }
               ]
             }

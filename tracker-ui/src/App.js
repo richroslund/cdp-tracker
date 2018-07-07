@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './makerdao.svg';
 import './main.css';
 import { Container, Hero, HeroHeader, Navbar, NavbarBrand, NavbarItem, Section } from 'bloomer';
-import { CdpTable } from './CdpTable';
+import { CdpTable, EthPrice } from './CdpTable';
 
 class App extends Component {
     render() {
@@ -25,6 +25,7 @@ class App extends Component {
                         <p className="App-intro">
             To get started, edit <code>src/App.js</code> and save to reload.
                         </p>
+                        <EthPrice />
                         <CdpTable />
                 </Container>
                 </Section>
