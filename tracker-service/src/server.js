@@ -23,15 +23,20 @@ app.get('/cdp', (req, res) => {
 app.post('/cdp/refresh', (req, res) => {
   var job = queue.create('fetch-cdps').save( function(err){
     if( err )
-      return res.json({error: err}, err);
-    return res.json({id: job.id}, job)
+      return res.json({error: err});
+    return res.json({id: job.id})
   });
 });
 
 app.get('/cdp/:cdpid', (req, res) => {
   console.dir(req.params.cdpid);
-  redis.createClient(process.env.REDIS_URL).hget("cdp", "req.params.cdpid", function (err, obj) {
-    return obj;
+  redis.createClient(process.env.REDIS_URL).hget("cdp", req.params.cdpid, function (err, obj) {
+    if (err) {
+      console.log(err);
+      return res.json(err);
+    }
+      
+    return res.json(JSON.parse(obj));
   });
 });
 
