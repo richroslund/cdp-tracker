@@ -84,3 +84,4 @@ yarn-error.log*
 
 # ignore css files
 /src/*.css
+**/build/**
