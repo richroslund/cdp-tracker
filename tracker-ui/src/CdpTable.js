@@ -4,67 +4,37 @@ import React from "react";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 import { Button, Container  } from 'bloomer';
+import PropTypes from 'prop-types';
+import  moment from 'moment';
 
 export class EthPrice extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      price: "NULL"
-    };
-  }
-  componentDidMount() {
-    this.intervalId = setInterval(() => this.loadData(), 5000);
-    this.loadData();
-  }
-  loadData() {
-    fetch(`${process.env.REACT_APP_API_URL}/price/eth`)
-    .then(res => res.json())
-    .then(results => {
-      if (results && results.price && this.state.price !== results.price) {
-        this.setState({...this.state, price: results.price});
-      }
-      
-    });
-  }
   render() {
-    const { price } = this.state;
-    return (
+    const { price } = this.props;
+    return ( price > 0 && (
       <div><strong>Ethereum:</strong> ${price}
       </div>
+    )
     );
   }
 }
 
+EthPrice.propTypes = {
+  price: PropTypes.number
+};
+
 export class CdpTable extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      data: []
-    };
-  }
-  componentDidMount() {
-    this.intervalId = setInterval(() => this.loadData(), 5000);
-    this.loadData();
-  }
-  loadData() {
-    return fetch(`${process.env.REACT_APP_API_URL}/cdp`)
-    .then(res => res.json())
-    .then(results => {
-      this.setState({...this.state, data: results});
-    });
-  }
   onClick() {
     fetch(`${process.env.REACT_APP_API_URL}/data/refresh`, {method: 'post'})
   }
   render() {
-    const { data } = this.state;
+    const { cdps } = this.props;
     return (
       <div>
         <Container>
           <Button isColor='info' onClick={this.onClick}>Refresh data</Button>
         </Container>
         <ReactTable
-          data={data}
+          data={cdps}
           columns={[
             {
               columns: [
@@ -97,6 +67,11 @@ export class CdpTable extends React.Component {
                   Header: "Owner",
                   accessor: "owner",
                   Cell: row => ( <a href={`https://etherscan.io/address/${row.value}`}> {row.value} </a> )
+                },
+                {
+                  Header: "Last Action",
+                  accessor: "time",
+                  Cell: row => ( <span> {moment(new Date(row.value)).fromNow()} </span>)
                 }
               ]
             }
@@ -109,3 +84,7 @@ export class CdpTable extends React.Component {
     );
   }
 }
+
+CdpTable.propTypes = {
+  cdps: PropTypes.array
+};

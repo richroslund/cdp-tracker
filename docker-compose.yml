@@ -31,7 +31,9 @@ services:
       - REDIS_URL=redis://redis:6379
     command: ["yarn", "run", "dev"]
   ui:
-    build: ./tracker-ui
+    build:
+      context: ./tracker-ui
+      dockerfile: Dockerfile
     volumes:
       - './tracker-ui:/app'
       - '/app/node_modules'

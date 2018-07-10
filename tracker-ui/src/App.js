@@ -5,6 +5,36 @@ import { Container, Hero, HeroHeader, Navbar, NavbarBrand, NavbarItem, Section }
 import { CdpTable, EthPrice } from './CdpTable';
 
 class App extends Component {
+    constructor() {
+        super();
+        this.state = {
+            cdps: [],
+            price: -1
+        };
+    }
+    componentDidMount() {
+        this.intervalId = setInterval(() => this.loadData(), 5000);
+        this.loadData();
+    }
+    loadData() {
+        return this.getCdps().then(this.getEthPrice());
+    }
+    getCdps() {
+        return fetch(`${process.env.REACT_APP_API_URL}/cdp`)
+        .then(res => res.json())
+        .then(results => {
+            this.setState({...this.state, cdps: results});
+        });
+    }
+    getEthPrice() {
+        return fetch(`${process.env.REACT_APP_API_URL}/price/eth`)
+                .then(res => res.json())
+                .then(results => {
+                    if (results && results.price && this.state.price !== results.price) {
+                        this.setState({...this.state, price: results.price});
+                    }
+                });
+    }
     render() {
         return (
             <div className="App">
@@ -25,8 +55,8 @@ class App extends Component {
                         <p className="App-intro">
             To get started, edit <code>src/App.js</code> and save to reload.
                         </p>
-                        <EthPrice />
-                        <CdpTable />
+                        <EthPrice price={this.state.price} />
+                        <CdpTable cdps={this.state.cdps} />
                 </Container>
                 </Section>
                 
