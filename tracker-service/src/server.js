@@ -11,21 +11,42 @@ var queue = kue.createQueue({redis: process.env.REDIS_URL});
 var db = redis.createClient(process.env.REDIS_URL);
 app.use(cors())
 
-var queueJob = (jobId) =>{
+var liquidationRate = ( 2 / 3 );
+var pethToEth = 1.013;
+
+var getLiquidation = (debt, collateral) => ((debt / liquidationRate) / collateral) / pethToEth;
+
+var queueJob = (jobId) => {
   var job = queue.create(jobId).save( function(err){
     if( err )
       return err;
     return job;
   });
-} 
+}
+var getEthPrice = () => {
+  db.get("eth:price", function (err, obj) {
+    if (err) {
+      console.log(err);
+      return err;
+    }
+    return JSON.parse(obj);
+  });
+}
 
 app.get('/', (req, res) => {
   return res.json({ version: "0.0.1" });
 });
 app.get('/cdp', (req, res) => {
   queueJob('fetch-cdps');
+  let ethPrice = getEthPrice();
   db.hgetall("cdp", function (err, obj) {
-    return res.json(_.map(obj, (cdp) => JSON.parse(cdp)));
+    let cdps = _.map(obj, (cdpStr) => {
+      var cdp = JSON.parse(cdpStr);
+      cdp.liquidation = getLiquidation(cdp.art, cdp.ink);
+      cdp.liquidationCloseness = cdp.liquidation / ethPrice;
+      return cdp;
+    })
+    return res.json(cdps);
   });
 });
 

@@ -3,6 +3,7 @@ import React from "react";
 // Import React Table
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+import { Button, Container  } from 'bloomer';
 
 export class EthPrice extends React.Component {
   constructor() {
@@ -12,10 +13,17 @@ export class EthPrice extends React.Component {
     };
   }
   componentDidMount() {
+    this.intervalId = setInterval(() => this.loadData(), 5000);
+    this.loadData();
+  }
+  loadData() {
     fetch(`${process.env.REACT_APP_API_URL}/price/eth`)
     .then(res => res.json())
     .then(results => {
-      this.setState({...this.state, price: results.price});
+      if (results && results.price && this.state.price !== results.price) {
+        this.setState({...this.state, price: results.price});
+      }
+      
     });
   }
   render() {
@@ -35,16 +43,26 @@ export class CdpTable extends React.Component {
     };
   }
   componentDidMount() {
-    fetch(`${process.env.REACT_APP_API_URL}/cdp`)
+    this.intervalId = setInterval(() => this.loadData(), 5000);
+    this.loadData();
+  }
+  loadData() {
+    return fetch(`${process.env.REACT_APP_API_URL}/cdp`)
     .then(res => res.json())
     .then(results => {
       this.setState({...this.state, data: results});
     });
   }
+  onClick() {
+    fetch(`${process.env.REACT_APP_API_URL}/data/refresh`, {method: 'post'})
+  }
   render() {
     const { data } = this.state;
     return (
       <div>
+        <Container>
+          <Button isColor='info' onClick={this.onClick}>Refresh data</Button>
+        </Container>
         <ReactTable
           data={data}
           columns={[
@@ -52,7 +70,8 @@ export class CdpTable extends React.Component {
               columns: [
                 {
                   Header: "Id",
-                  accessor: "cupi"
+                  accessor: "cupi", 
+                  Cell: row => ( <a href={`https://mkr.tools/cdp/${row.value}`}>{row.value}</a>)
                 },
                 {
                   Header: "Peth (collateral)",
@@ -70,9 +89,14 @@ export class CdpTable extends React.Component {
             },
             {
               columns: [
+                { 
+                  Header: "Liquidation price",
+                  accessor: 'liquidation'
+                },
                 {
                   Header: "Owner",
-                  accessor: "owner"
+                  accessor: "owner",
+                  Cell: row => ( <a href={`https://etherscan.io/address/${row.value}`}> {row.value} </a> )
                 }
               ]
             }
